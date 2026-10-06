@@ -13,19 +13,16 @@ The fake mute setting does not mute your microphone locally. If it is enabled, y
 
 ## Install
 
-Requirements: Windows, an existing Vencord source checkout, Node.js, and pnpm. Save or clone this project to `%USERPROFILE%\Desktop\Vencord-FakeDeafen`, then run `install.cmd` and enter the path to your Vencord folder when prompted. The installer creates `src\userplugins` when missing, copies the plugin there, then runs the build and installer.
+Requirements: Windows, Git, Node.js, and pnpm. Clone or save this project to `%USERPROFILE%\Desktop\Vencord-FakeDeafen`, then run `install.cmd`. The installer clones the official Vencord source into `%USERPROFILE%\Desktop\Vencord` if it is missing, installs dependencies, creates `src\userplugins` if needed, copies the plugin, builds Vencord, and runs its installer. You can pass a different Vencord path as an argument to `install.cmd`.
 
-The equivalent commands in one CMD block are below. If you saved this project somewhere else, update `PLUGIN_DIR` first.
+The complete setup can also be run from one CMD block. If you saved this project somewhere else, update `PLUGIN_DIR` first. Git, Node.js, and pnpm must already be installed.
 
 ```cmd
 set "PLUGIN_DIR=%USERPROFILE%\Desktop\Vencord-FakeDeafen"
 set "VENCORD_DIR=%USERPROFILE%\Desktop\Vencord"
-if not exist "%VENCORD_DIR%\src\userplugins" mkdir "%VENCORD_DIR%\src\userplugins"
-copy /Y "%PLUGIN_DIR%\src\FakeDeafen.ts" "%VENCORD_DIR%\src\userplugins\FakeDeafen.ts"
-cd /d "%VENCORD_DIR%"
-pnpm build
+if not exist "%PLUGIN_DIR%\.git" git clone https://github.com/Malekzn30/tktkaishduoabfjokxcnv.git "%PLUGIN_DIR%"
 if errorlevel 1 exit /b 1
-pnpm inject
+call "%PLUGIN_DIR%\install.cmd" "%VENCORD_DIR%"
 ```
 
 Restart Discord after injection. Find the plugin under **Settings > Plugins > FakeDeafen**. The account-area button can be enabled in the plugin settings; changing that option requires a restart.
