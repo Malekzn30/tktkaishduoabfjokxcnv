@@ -21,8 +21,9 @@ The complete setup can also be run from one CMD block. If you saved this project
 set "PLUGIN_DIR=%USERPROFILE%\Desktop\Vencord-FakeDeafen"
 set "VENCORD_DIR=%USERPROFILE%\Desktop\Vencord"
 if not exist "%PLUGIN_DIR%\.git" git clone https://github.com/Malekzn30/tktkaishduoabfjokxcnv.git "%PLUGIN_DIR%"
-if errorlevel 1 exit /b 1
-call "%PLUGIN_DIR%\install.cmd" "%VENCORD_DIR%"
+if exist "%PLUGIN_DIR%\install.cmd" call "%PLUGIN_DIR%\install.cmd" "%VENCORD_DIR%"
+if not exist "%PLUGIN_DIR%\install.cmd" echo ERROR: the plugin download failed. Check your internet connection and Git installation.
+pause
 ```
 
 Restart Discord after injection. Find the plugin under **Settings > Plugins > FakeDeafen**. The account-area button can be enabled in the plugin settings; changing that option requires a restart.
