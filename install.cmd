@@ -7,8 +7,23 @@ if not "%~1"=="" set "VENCORD_DIR=%~1"
 
 where git >nul 2>&1
 if errorlevel 1 (
-    echo Git is required. Install Git for Windows, then run this installer again.
-    exit /b 1
+    where winget >nul 2>&1
+    if errorlevel 1 (
+        echo Git is missing and winget is not available. Install Git for Windows, then run this installer again.
+        exit /b 1
+    )
+    echo Git was not found. Attempting to install Git for Windows with winget...
+    winget install --id Git.Git --exact --silent --accept-source-agreements --accept-package-agreements
+    if errorlevel 1 (
+        echo Git installation failed. Install Git for Windows manually, then run this installer again.
+        exit /b 1
+    )
+    set "PATH=%ProgramFiles%\Git\cmd;%LOCALAPPDATA%\Programs\Git\cmd;%PATH%"
+    where git >nul 2>&1
+    if errorlevel 1 (
+        echo Git was installed but could not be found. Restart CMD and run this installer again.
+        exit /b 1
+    )
 )
 
 where node >nul 2>&1
