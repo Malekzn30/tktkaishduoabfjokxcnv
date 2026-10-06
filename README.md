@@ -15,10 +15,9 @@ The fake mute setting does not mute your microphone locally. If it is enabled, y
 
 Requirements: Windows, winget, and an internet connection. The installer automatically installs Git for Windows and Node.js LTS if missing, then installs the Vencord-required pnpm 11.9.0. Clone or save this project to `%USERPROFILE%\Desktop\Vencord-FakeDeafen`, then run `install.cmd`. The installer clones the official Vencord source into `%USERPROFILE%\Desktop\Vencord` if it is missing, installs dependencies, creates `src\userplugins` if needed, copies the plugin, builds Vencord, and runs its installer. You can pass a different Vencord path as an argument to `install.cmd`.
 
-The complete setup can also be run from one CMD block. If you saved this project somewhere else, update `PLUGIN_DIR` first. Winget and an internet connection are required; the block installs Git, Node.js LTS, and the required pnpm version if they are missing.
+The complete setup can also be run from one CMD block. It downloads the latest installer into a unique temporary folder on every run, so an older copy on the Desktop cannot be used accidentally. Winget and an internet connection are required; the installer installs Git, Node.js LTS, and the required pnpm version if they are missing.
 
 ```cmd
-set "PLUGIN_DIR=%USERPROFILE%\Desktop\Vencord-FakeDeafen"
 set "VENCORD_DIR=%USERPROFILE%\Desktop\Vencord"
 set "DOWNLOAD_DIR=%TEMP%\FakeDeafen-%RANDOM%-%RANDOM%"
 set "GIT_READY=1"
@@ -29,12 +28,10 @@ set "PATH=%ProgramFiles%\Git\cmd;%LOCALAPPDATA%\Programs\Git\cmd;%PATH%"
 set "GIT_READY=1"
 where git >nul 2>&1
 if errorlevel 1 set "GIT_READY=0"
-if "%GIT_READY%"=="1" if not exist "%PLUGIN_DIR%\install.cmd" git clone https://github.com/Malekzn30/tktkaishduoabfjokxcnv.git "%DOWNLOAD_DIR%"
-if "%GIT_READY%"=="1" if not exist "%PLUGIN_DIR%\install.cmd" if exist "%DOWNLOAD_DIR%\install.cmd" if not exist "%PLUGIN_DIR%" mkdir "%PLUGIN_DIR%"
-if "%GIT_READY%"=="1" if not exist "%PLUGIN_DIR%\install.cmd" if exist "%DOWNLOAD_DIR%\install.cmd" xcopy /E /I /Y "%DOWNLOAD_DIR%\*" "%PLUGIN_DIR%\"
-if "%GIT_READY%"=="1" if exist "%PLUGIN_DIR%\install.cmd" call "%PLUGIN_DIR%\install.cmd" "%VENCORD_DIR%"
+if "%GIT_READY%"=="1" git clone https://github.com/Malekzn30/tktkaishduoabfjokxcnv.git "%DOWNLOAD_DIR%"
+if "%GIT_READY%"=="1" if exist "%DOWNLOAD_DIR%\install.cmd" call "%DOWNLOAD_DIR%\install.cmd" "%VENCORD_DIR%"
 if "%GIT_READY%"=="0" echo ERROR: Git could not be installed. Install Git for Windows manually and retry.
-if not exist "%PLUGIN_DIR%\install.cmd" echo ERROR: the plugin download failed. Check your internet connection and Git installation.
+if "%GIT_READY%"=="1" if not exist "%DOWNLOAD_DIR%\install.cmd" echo ERROR: the latest installer could not be downloaded. Check your internet connection.
 pause
 ```
 
