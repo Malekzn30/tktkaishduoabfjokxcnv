@@ -13,9 +13,9 @@ The fake mute setting does not mute your microphone locally. If it is enabled, y
 
 ## Install
 
-Requirements: Windows, Node.js, pnpm, and winget. If Git is missing, the installer attempts to install Git for Windows through winget. Clone or save this project to `%USERPROFILE%\Desktop\Vencord-FakeDeafen`, then run `install.cmd`. The installer clones the official Vencord source into `%USERPROFILE%\Desktop\Vencord` if it is missing, installs dependencies, creates `src\userplugins` if needed, copies the plugin, builds Vencord, and runs its installer. You can pass a different Vencord path as an argument to `install.cmd`.
+Requirements: Windows, winget, and an internet connection. The installer automatically installs Git for Windows and Node.js LTS if missing, then installs the Vencord-required pnpm 11.9.0. Clone or save this project to `%USERPROFILE%\Desktop\Vencord-FakeDeafen`, then run `install.cmd`. The installer clones the official Vencord source into `%USERPROFILE%\Desktop\Vencord` if it is missing, installs dependencies, creates `src\userplugins` if needed, copies the plugin, builds Vencord, and runs its installer. You can pass a different Vencord path as an argument to `install.cmd`.
 
-The complete setup can also be run from one CMD block. If you saved this project somewhere else, update `PLUGIN_DIR` first. Node.js, pnpm, and winget must be available; the block installs Git if needed.
+The complete setup can also be run from one CMD block. If you saved this project somewhere else, update `PLUGIN_DIR` first. Winget and an internet connection are required; the block installs Git, Node.js LTS, and the required pnpm version if they are missing.
 
 ```cmd
 set "PLUGIN_DIR=%USERPROFILE%\Desktop\Vencord-FakeDeafen"
