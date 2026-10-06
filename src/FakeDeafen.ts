@@ -50,8 +50,8 @@ function publishVoiceState() {
     socket.send(4, {
         guild_id: channel?.guild_id ?? null,
         channel_id: channelId,
-        self_mute: settings.store.fakeMute || (MediaEngineStore.isMute() ?? false),
-        self_deaf: settings.store.fakeDeafen || (MediaEngineStore.isDeaf() ?? false),
+        self_mute: (enabled && settings.store.fakeMute) || (MediaEngineStore.isMute() ?? false),
+        self_deaf: (enabled && settings.store.fakeDeafen) || (MediaEngineStore.isDeaf() ?? false),
         self_video: false,
         flags: 0
     });
