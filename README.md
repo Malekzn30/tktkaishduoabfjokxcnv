@@ -8,8 +8,11 @@ Userplugin for Vencord that changes the mute/deafen flags sent in Discord voice-
 - Optional account-area button.
 - `Ctrl+Shift+Q` toggle, enabled by default.
 - Voice settings context-menu toggle.
+- Follow a user into their voice channel from their user context menu.
 
 The fake mute setting does not mute your microphone locally. If it is enabled, you may still transmit audio while Discord displays you as muted. Fake deafen is also a client-state spoof and may violate Discord's Terms of Service; use at your own risk.
+
+The Follow User action joins the selected user's current voice channel, then follows their voice-channel changes by default. Automatic joins and disconnecting when they leave can be changed in plugin settings. This feature is adapted from [D3SOX/vc-followUser](https://github.com/D3SOX/vc-followUser), an archived, unmaintained plugin.
 
 ## Install
 

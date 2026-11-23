@@ -2,7 +2,7 @@ import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import definePlugin, { OptionType } from "@utils/types";
 import { findByPropsLazy, findComponentByCodeLazy, findStoreLazy } from "@webpack";
-import { Menu, React } from "@webpack/common";
+import { Menu, PermissionStore, PermissionsBits, React, Toasts, UserStore } from "@webpack/common";
 
 const settings = definePluginSettings({
     fakeMute: {
@@ -25,16 +25,89 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         default: true,
         description: "Enable Ctrl+Shift+Q to toggle Fake Deafen"
+    },
+    followUserId: {
+        type: OptionType.STRING,
+        default: "",
+        hidden: true,
+        description: "User followed from their context menu"
+    },
+    joinOnFollow: {
+        type: OptionType.BOOLEAN,
+        default: true,
+        description: "Join the followed user's current voice channel when selecting Follow User"
+    },
+    followVoiceChanges: {
+        type: OptionType.BOOLEAN,
+        default: true,
+        description: "Automatically join when the followed user changes voice channels"
+    },
+    disconnectWhenUserLeaves: {
+        type: OptionType.BOOLEAN,
+        default: false,
+        description: "Disconnect when the followed user leaves their voice channel"
     }
 });
 
 const GatewaySocket = findByPropsLazy("getSocket");
+const ChannelActions = findByPropsLazy("disconnect", "selectVoiceChannel");
 const MediaEngineStore = findByPropsLazy("isDeaf", "isMute");
 const ChannelStore = findStoreLazy("ChannelStore");
 const SelectedChannelStore = findStoreLazy("SelectedChannelStore");
+const VoiceStateStore = findStoreLazy("VoiceStateStore");
 const Button = findComponentByCodeLazy(".GREEN,positionKeyStemOverride:");
+const CONNECT = 1n << 20n;
 let enabled = false;
 let originalSend: Function | undefined;
+
+function getUserVoiceChannel(userId: string): string | null {
+    if (!userId) return null;
+
+    const states = VoiceStateStore.getAllVoiceStates();
+    for (const users of Object.values(states)) {
+        if (users[userId]) return users[userId].channelId ?? null;
+    }
+
+    return null;
+}
+
+function followUser(channelId = getUserVoiceChannel(settings.store.followUserId)) {
+    if (!settings.store.followUserId) return;
+
+    const currentChannelId = SelectedChannelStore.getVoiceChannelId();
+    if (!channelId) {
+        if (currentChannelId && settings.store.disconnectWhenUserLeaves) {
+            ChannelActions.disconnect();
+            Toasts.show({ message: "Followed user left; disconnected", id: Toasts.genId(), type: Toasts.Type.SUCCESS });
+        } else {
+            Toasts.show({ message: "Followed user is not in a voice channel", id: Toasts.genId(), type: Toasts.Type.FAILURE });
+        }
+        return;
+    }
+
+    if (channelId === currentChannelId) return;
+
+    const channel = ChannelStore.getChannel(channelId);
+    if (!channel || (channel.type !== 1 && !PermissionStore.can(CONNECT, channel))) {
+        Toasts.show({ message: "Insufficient permissions to join that voice channel", id: Toasts.genId(), type: Toasts.Type.FAILURE });
+        return;
+    }
+
+    const voiceStates = VoiceStateStore.getVoiceStatesForChannel(channelId);
+    const memberCount = voiceStates ? Object.keys(voiceStates).length : null;
+    if (
+        channel.userLimit !== 0 &&
+        memberCount !== null &&
+        memberCount >= channel.userLimit &&
+        !PermissionStore.can(PermissionsBits.MOVE_MEMBERS, channel)
+    ) {
+        Toasts.show({ message: "Voice channel is full", id: Toasts.genId(), type: Toasts.Type.FAILURE });
+        return;
+    }
+
+    ChannelActions.selectVoiceChannel(channelId);
+    Toasts.show({ message: "Joined the followed user's voice channel", id: Toasts.genId(), type: Toasts.Type.SUCCESS });
+}
 
 function toggleFakeDeafen() {
     enabled = !enabled;
@@ -94,6 +167,35 @@ export default definePlugin({
     ],
 
     contextMenus: {
+        "user-context"(children, { user }) {
+            if (!user || user.id === UserStore.getCurrentUser().id) return;
+
+            const isFollowed = settings.store.followUserId === user.id;
+            const items = [
+                React.createElement(Menu.MenuItem, {
+                    id: "fake-deafen-follow-user",
+                    label: isFollowed ? "Go to user's voice channel" : "Follow User",
+                    action: () => {
+                        if (isFollowed) {
+                            followUser();
+                        } else {
+                            settings.store.followUserId = user.id;
+                            if (settings.store.joinOnFollow) followUser();
+                        }
+                    }
+                })
+            ];
+
+            if (isFollowed) {
+                items.push(React.createElement(Menu.MenuItem, {
+                    id: "fake-deafen-unfollow-user",
+                    label: "Unfollow User",
+                    action: () => { settings.store.followUserId = ""; }
+                }));
+            }
+
+            children.splice(-1, 0, React.createElement(Menu.MenuGroup, { key: "fake-deafen-follow-user" }, ...items));
+        },
         "audio-device-context"(children) {
             children.push(
                 React.createElement(Menu.MenuSeparator),
@@ -104,6 +206,21 @@ export default definePlugin({
                     action: toggleFakeDeafen
                 })
             );
+        }
+    },
+
+    flux: {
+        VOICE_STATE_UPDATES({ voiceStates }: { voiceStates: Array<{ userId: string; channelId?: string; oldChannelId?: string; }>; }) {
+            if (!settings.store.followVoiceChanges || !settings.store.followUserId) return;
+
+            for (const { userId, channelId, oldChannelId } of voiceStates) {
+                if (userId !== settings.store.followUserId || channelId === oldChannelId) continue;
+                if (channelId) {
+                    followUser(channelId);
+                } else if (settings.store.disconnectWhenUserLeaves) {
+                    followUser(null);
+                }
+            }
         }
     },
 
