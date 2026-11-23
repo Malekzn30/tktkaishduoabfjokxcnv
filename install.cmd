@@ -53,18 +53,18 @@ if errorlevel 1 (
     goto :fail
 )
 
-pnpm --version 2>nul | findstr /x "11.9.0" >nul
+pnpm --version 2>nul | findstr /x "12.15.0" >nul
 if errorlevel 1 (
-    echo Installing the pnpm version required by Vencord (11.9.0)...
-    call npm install --global pnpm@11.9.0
+    echo Installing the pnpm version required by Vencord ^(12.15.0^)...
+    call npm install --global pnpm@12.15.0
     if errorlevel 1 (
         echo pnpm installation failed. Check your internet connection and npm permissions.
         goto :fail
     )
     set "PATH=%APPDATA%\npm;%PATH%"
-    pnpm --version 2>nul | findstr /x "11.9.0" >nul
+    pnpm --version 2>nul | findstr /x "12.15.0" >nul
     if errorlevel 1 (
-        echo pnpm 11.9.0 was installed but is not available in PATH. Restart CMD and run this installer again.
+        echo pnpm 12.15.0 was installed but is not available in PATH. Restart CMD and run this installer again.
         goto :fail
     )
 )

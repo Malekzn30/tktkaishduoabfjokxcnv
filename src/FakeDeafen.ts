@@ -2,7 +2,7 @@ import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import definePlugin, { OptionType } from "@utils/types";
 import { findByPropsLazy, findComponentByCodeLazy, findStoreLazy } from "@webpack";
-import { Menu, PermissionStore, PermissionsBits, React, Toasts, UserStore } from "@webpack/common";
+import { Menu, PermissionStore, PermissionsBits, React, showToast, UserStore } from "@webpack/common";
 
 const settings = definePluginSettings({
     fakeMute: {
@@ -78,9 +78,9 @@ function followUser(channelId = getUserVoiceChannel(settings.store.followUserId)
     if (!channelId) {
         if (currentChannelId && settings.store.disconnectWhenUserLeaves) {
             ChannelActions.disconnect();
-            Toasts.show({ message: "Followed user left; disconnected", id: Toasts.genId(), type: Toasts.Type.SUCCESS });
+            showToast({ text: "Followed user left; disconnected", variant: "success" });
         } else {
-            Toasts.show({ message: "Followed user is not in a voice channel", id: Toasts.genId(), type: Toasts.Type.FAILURE });
+            showToast({ text: "Followed user is not in a voice channel", variant: "critical" });
         }
         return;
     }
@@ -89,7 +89,7 @@ function followUser(channelId = getUserVoiceChannel(settings.store.followUserId)
 
     const channel = ChannelStore.getChannel(channelId);
     if (!channel || (channel.type !== 1 && !PermissionStore.can(CONNECT, channel))) {
-        Toasts.show({ message: "Insufficient permissions to join that voice channel", id: Toasts.genId(), type: Toasts.Type.FAILURE });
+        showToast({ text: "Insufficient permissions to join that voice channel", variant: "critical" });
         return;
     }
 
@@ -101,12 +101,12 @@ function followUser(channelId = getUserVoiceChannel(settings.store.followUserId)
         memberCount >= channel.userLimit &&
         !PermissionStore.can(PermissionsBits.MOVE_MEMBERS, channel)
     ) {
-        Toasts.show({ message: "Voice channel is full", id: Toasts.genId(), type: Toasts.Type.FAILURE });
+        showToast({ text: "Voice channel is full", variant: "critical" });
         return;
     }
 
     ChannelActions.selectVoiceChannel(channelId);
-    Toasts.show({ message: "Joined the followed user's voice channel", id: Toasts.genId(), type: Toasts.Type.SUCCESS });
+    showToast({ text: "Joined the followed user's voice channel", variant: "success" });
 }
 
 function toggleFakeDeafen() {

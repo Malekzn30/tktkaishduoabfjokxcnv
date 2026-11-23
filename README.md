@@ -16,7 +16,7 @@ The Follow User action joins the selected user's current voice channel, then fol
 
 ## Install
 
-Requirements: Windows, winget, and an internet connection. The installer automatically installs Git for Windows and Node.js LTS if missing, then installs the Vencord-required pnpm 11.9.0. Clone or save this project to `%USERPROFILE%\Desktop\Vencord-FakeDeafen`, then run `install.cmd`. The installer clones the official Vencord source into `%USERPROFILE%\Desktop\Vencord` if it is missing, installs dependencies, creates `src\userplugins` if needed, copies the plugin, builds Vencord, and runs its installer. You can pass a different Vencord path as an argument to `install.cmd`.
+Requirements: Windows, winget, and an internet connection. The installer automatically installs Git for Windows and Node.js LTS if missing, then installs the Vencord-required pnpm 12.15.0. Clone or save this project to `%USERPROFILE%\Desktop\Vencord-FakeDeafen`, then run `install.cmd`. The installer clones the official Vencord source into `%USERPROFILE%\Desktop\Vencord` if it is missing, installs dependencies, creates `src\userplugins` if needed, copies the plugin, builds Vencord, and runs its installer. You can pass a different Vencord path as an argument to `install.cmd`.
 
 The complete setup can also be run from one CMD block. It downloads the latest installer into a unique temporary folder on every run, so an older copy on the Desktop cannot be used accidentally. Winget and an internet connection are required; the installer installs Git, Node.js LTS, and the required pnpm version if they are missing.
 
